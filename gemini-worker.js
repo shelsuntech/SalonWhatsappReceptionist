@@ -31,7 +31,7 @@ export default {
 
         // --- NEW GATEWAY INTEGRATION START ---
         // We now route through the Cloudflare Dynamic Route instead of direct to Google
-        const GATEWAY_URL = `https://gateway.ai.cloudflare.com/v1/${env.ACCOUNT_ID}/${env.GATEWAY_ID}/dynamic/receptionist-ai-gateway`;
+        const GATEWAY_URL = `https://gateway.ai.cloudflare.com/v1/${env.ACCOUNT_ID}/${env.GATEWAY_ID}/receptionist-ai-gateway/compat`;
 
         console.log("Routing request through AI Gateway flow...");
         /*const gatewayResponse = await fetch(GATEWAY_URL, {

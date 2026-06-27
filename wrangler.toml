@@ -7,3 +7,4 @@ invocation_logs = true
 
 [observability.traces]
 enabled = true
+binding = "AI"

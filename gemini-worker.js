@@ -34,7 +34,7 @@ export default {
         const GATEWAY_URL = `https://gateway.ai.cloudflare.com/v1/${env.ACCOUNT_ID}/${env.GATEWAY_ID}/dynamic/receptionist-flow`;
 
         console.log("Routing request through AI Gateway flow...");
-        const gatewayResponse = await fetch(GATEWAY_URL, {
+        /*const gatewayResponse = await fetch(GATEWAY_URL, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -49,12 +49,60 @@ export default {
               { role: "user", content: customerText }
             ]
           })
-        });
+        }); */
+        // --- REPLACE YOUR GATEWAY FETCH BLOCK WITH THIS ---
+console.log("Sending to Gateway...");
+const gatewayResponse = await fetch(GATEWAY_URL, {
+  method: 'POST',
+  headers: { 
+    'Content-Type': 'application/json',
+    'cf-aig-authorization': `Bearer ${env.CF_AIG_TOKEN}`
+  },
+  body: JSON.stringify({
+    messages: [
+      { role: "system", content: "You are a helpful assistant for ShelSun Tech." },
+      { role: "user", content: customerText }
+    ]
+  })
+});
 
-        const gatewayData = await gatewayResponse.json();
+// LOG THE STATUS AND RAW TEXT
+console.log("Gateway HTTP Status:", gatewayResponse.status);
+const rawResponse = await gatewayResponse.text();
+console.log("Raw Gateway Response:", rawResponse);
+
+// NOW ATTEMPT PARSING
+let botReply = "Sorry, I am having trouble.";
+try {
+  const data = JSON.parse(rawResponse);
+  // Support both OpenAI-style and direct Google-style responses
+  botReply = data.choices?.[0]?.message?.content || 
+             data.candidates?.[0]?.content?.parts?.[0]?.text || 
+             "No response content found.";
+} catch (e) {
+  botReply = "Failed to parse JSON response.";
+}
+// --- END DEBUG BLOCK ---
+
+       /* const gatewayData = await gatewayResponse.json();
         // The Gateway returns the response from either Gemini or the Llama fallback automatically
         const botReply = gatewayData.choices?.[0]?.message?.content || gatewayData.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I am having trouble responding.";
-        console.log(`Gateway response received: "${botReply}"`);
+        console.log(`Gateway response received: "${botReply}"`);*/
+        // Replace your parsing section with this:
+const gatewayData = await gatewayResponse.json();
+
+// Log the whole object so you can see it in your Dashboard Logs
+console.log("Full Gateway Data:", JSON.stringify(gatewayData));
+
+// Extract content safely
+//let botReply = "";
+if (gatewayData.choices && gatewayData.choices[0].message) {
+  botReply = gatewayData.choices[0].message.content;
+} else if (gatewayData.candidates && gatewayData.candidates[0].content) {
+  botReply = gatewayData.candidates[0].content.parts[0].text;
+} else {
+  botReply = "Data format unrecognized: " + JSON.stringify(gatewayData);
+}
         // --- NEW GATEWAY INTEGRATION END ---
 
         // 3. VERIFIED META GRAPH API v20.0 ENDPOINT

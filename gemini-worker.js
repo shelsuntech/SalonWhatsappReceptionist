@@ -27,7 +27,7 @@ if (request.method === 'POST') {
     async function handleProcessing(body, env) {
     if (request.method === 'POST') {
       try {
-        const body = await request.json();
+ // revert it later        const body = await request.json();
         
         // ... (Keep your existing safe layer verification checks)
         if (!body.object || !body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]) return new Response('Event ignored', { status: 200 });

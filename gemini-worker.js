@@ -20,6 +20,26 @@ console.log("=================1=================");
     if (request.method === 'POST') {
       try {
         console.log("=================3=======inside post method==========");
+// Inside your POST block, before extracting messageData:
+const entry = body.entry?.[0];
+const changes = entry?.changes?.[0]?.value;
+
+// 1. Check for Status Updates (Ignore these)
+if (changes?.statuses) {
+  console.log("Ignored: Received a status update (e.g., delivered/read)");
+  return new Response('Status update ignored', { status: 200 });
+}
+
+// 2. Check for Inbound Messages
+if (!changes?.messages?.[0]) {
+  console.log("Ignored: Payload is not a message or status update");
+  return new Response('Event ignored', { status: 200 });
+}
+
+// Now you can safely proceed with your existing message logic:
+const messageData = changes.messages[0];
+// ... rest of your code
+        
         const body = await request.json();
         console.log("Webhook payload payload body extracted:", JSON.stringify(body));
 

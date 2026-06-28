@@ -17,6 +17,10 @@ export default {
     if (request.method === 'POST') {
       const body = await request.json();
 
+console.log("========== WEBHOOK ==========");
+console.log(new Date().toISOString());
+console.log(JSON.stringify(body, null, 2));
+
       // Check for Status Updates (Ignore these)
       if (body.entry?.[0]?.changes?.[0]?.value?.statuses) {
         return new Response('Status update ignored', { status: 200 });
@@ -24,6 +28,8 @@ export default {
 
       // Check for Inbound Messages
       const messageData = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+console.log("messageData:",JSON.stringify(messageData, null, 2));
+      
       if (!messageData || messageData.type !== 'text') {
         return new Response('Event ignored', { status: 200 });
       }
@@ -40,6 +46,17 @@ export default {
 async function handleProcessing(messageData, body, env) {
   const customerPhone = messageData.from;
   const customerText = messageData.text.body;
+
+console.log("Customer:", customerPhone);
+console.log("Text:", customerText);
+
+  if (
+    messageData.from === env.WHATSAPP_PHONE_NUMBER_ID
+) {
+    return new Response("Ignoring self message", {
+        status:200
+    });
+}
   let botReply = "Sorry, I am having trouble responding right now.";
 
   // A. TRY GEMINI FIRST

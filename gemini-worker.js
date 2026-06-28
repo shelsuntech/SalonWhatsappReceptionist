@@ -4,6 +4,7 @@ export default {
 console.log("=================1=================");
     // 1. ROUTE FOR WHATSAPP HANDSHAKE (GET /) or (GET /webhook)
     if (request.method === 'GET') {
+      console.log("=================2======inside Get method===========");
       console.log("Incoming verification handshake request received");
       const mode = url.searchParams.get('hub.mode');
       const token = url.searchParams.get('hub.verify_token');
@@ -18,6 +19,7 @@ console.log("=================1=================");
     // 2. ROUTE FOR INCOMING LIVE WHATSAPP CHATS (POST /)
     if (request.method === 'POST') {
       try {
+        console.log("=================3=======inside post method==========");
         const body = await request.json();
         console.log("Webhook payload payload body extracted:", JSON.stringify(body));
 

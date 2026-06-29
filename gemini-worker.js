@@ -458,3 +458,50 @@ function isSupportedTextMessage(messageData) {
   return true;
 
 }
+
+// Google Sheet Place holder
+async function saveLeadToGoogleSheet(
+  env,
+  requestId,
+  lead
+) {
+
+  log(
+    requestId,
+    "Google Sheets integration not enabled."
+  );
+
+}
+//Duplicate capture placeholder
+async function isDuplicateMessage(
+  env,
+  messageId
+) {
+
+  // Future:
+  // Cloudflare KV lookup
+
+  return false;
+
+}
+
+
+/*
+==================================================
+
+FUTURE FEATURES
+
+[ ] Cloudflare KV
+    - duplicate detection
+    - conversation memory
+
+[ ] Google Sheets Lead Capture
+
+[ ] Appointment Booking
+
+[ ] Human Handover
+
+[ ] Business Knowledge Base
+
+==================================================
+*/

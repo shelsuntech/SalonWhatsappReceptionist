@@ -362,51 +362,103 @@ const customerText =messageData.text?.body?.trim() || "";
     `[${requestId}] Sending WhatsApp reply...`
   );
 
-  const waResponse = await fetch(
+// ======================================================
+// SEND REPLY TO WHATSAPP
+// ======================================================
 
-    `https://graph.facebook.com/v20.0/${env.WHATSAPP_PHONE_NUMBER_ID}/messages`,
+const waResponse = await fetch(
+  `https://graph.facebook.com/v20.0/${env.WHATSAPP_PHONE_NUMBER_ID}/messages`,
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      recipient_type: "individual",
+      to: customerPhone,
+      type: "text",
+      text: {
+        preview_url: false,
+        body: botReply
+      }
+    })
+  }
+);
 
+if (!waResponse.ok) {
+
+  console.error(
+    "WhatsApp send failed:",
+    await waResponse.text()
+  );
+
+  return;
+
+}
+
+console.log("WhatsApp message sent successfully.");
+
+  // ======================================================
+// SAVE / UPDATE CRM/Google sheet
+// ======================================================
+
+try {
+
+  const crmResponse = await fetch(
+    env.GOOGLE_SHEET_WEBHOOK_URL,
     {
-
       method: "POST",
-
       headers: {
-
-        Authorization:
-          `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`,
-
-        "Content-Type":
-          "application/json"
-
+        "Content-Type": "application/json"
       },
-
       body: JSON.stringify({
 
-        messaging_product: "whatsapp",
+        platform: "WhatsApp",
 
-        recipient_type: "individual",
+        customerId: customerPhone,
 
-        to: customerPhone,
+        phone: customerPhone,
 
-        type: "text",
+        name: "",
 
-        text: {
+        email: "",
 
-          preview_url: false,
+        business: "",
 
-          body: botReply
+        service: "",
 
-        }
+        requirement: "",
+
+        appointmentDate: "",
+
+        appointmentTime: "",
+
+        appointmentStatus: "None",
+
+        leadStatus: "New",
+
+        lastMessage: customerText
 
       })
-
     }
-
   );
 
   console.log(
-    `[${requestId}] WhatsApp Status: ${waResponse.status}`
+    "CRM:",
+    await crmResponse.text()
   );
+
+}
+catch (err) {
+
+  console.error(
+    "CRM Error:",
+    err
+  );
+
+}
 
   const waResponseBody =
     await waResponse.text();

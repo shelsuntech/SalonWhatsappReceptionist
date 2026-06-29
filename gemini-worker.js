@@ -188,9 +188,13 @@ export default {
 
 async function handleProcessing(messageData, body, env, requestId) {
 
-  const customerPhone = messageData.from;
-  const customerText = messageData.text.body.trim();
-
+  //const customerPhone = messageData.from;
+ // const customerText = messageData.text.body.trim();
+  
+const customerPhone =messageData.from?.trim();
+  
+const customerText =messageData.text?.body?.trim() || "";
+  
   console.log(`[${requestId}] ===== PROCESSING START =====`);
   console.log(`[${requestId}] Customer: ${customerPhone}`);
   console.log(`[${requestId}] Text: ${customerText}`);
